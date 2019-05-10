@@ -22,28 +22,30 @@ def init(interface=0, alternate=0):
 
     return intf
 
-def _ep_type(intf,type):
+
+def _ep_type(intf, type):
     ep = usb.util.find_descriptor(
         intf,
-        custom_match = \
-        lambda e: \
-            usb.util.endpoint_direction(e.bEndpointAddress) == \
-            type)
+        custom_match=lambda e:
+            usb.util.endpoint_direction(e.bEndpointAddress) == type)
 
     assert ep is not None
     return ep
 
+
 def ep_out(intf):
     return _ep_type(intf, usb.util.ENDPOINT_OUT)
+
 
 def ep_in(intf):
     return _ep_type(intf, usb.util.ENDPOINT_IN)
 
+
 if __name__ == "__main__":
     import argparse
     a = argparse.ArgumentParser('USB channel stdin -> TX, RX -> stdout')
-    a.add_argument('-i','--interface', action='store', default=0, type=int)
-    a.add_argument('-t','--timeout', action='store', default=1000, type=int)
+    a.add_argument('-i', '--interface', action='store', default=0, type=int)
+    a.add_argument('-t', '--timeout', action='store', default=1000, type=int)
     args = a.parse_args()
 
     intf = init(interface=args.interface)
