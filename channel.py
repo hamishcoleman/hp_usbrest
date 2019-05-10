@@ -43,9 +43,13 @@ def ep_in(intf):
 
 if __name__ == "__main__":
     import argparse
+    import select
+
+    BUFSIZE = 2048
+
     a = argparse.ArgumentParser('USB channel stdin -> TX, RX -> stdout')
     a.add_argument('-i', '--interface', action='store', default=0, type=int)
-    a.add_argument('-t', '--timeout', action='store', default=1000, type=int)
+    a.add_argument('-t', '--timeout', action='store', default=200, type=int)
     args = a.parse_args()
 
     intf = init(interface=args.interface)
@@ -53,27 +57,42 @@ if __name__ == "__main__":
     from_usb = ep_in(intf)
     to_usb = ep_out(intf)
 
-    from_pipe = open(0, 'rb')
-    to_pipe = open(1, 'wb')
+    from_pipe = open(0, 'rb', buffering=0)
+    to_pipe = open(1, 'wb', buffering=0)
 
-    # Assume stdin has just one request on it, so read it all in one go
-    buf = from_pipe.read()
+    rsocks = [from_pipe]
+    xsocks = [from_pipe, to_pipe]
 
-    nbytes = to_usb.write(buf)
-    if nbytes != len(buf):
-        raise ValueError("Short write to usb")
-
-    # Assume that usb has a large amount of data, and try to read it all:
+    usb_timeouts = 0
 
     while True:
-        try:
-            buf = from_usb.read(4096, timeout=args.timeout)
-            if len(buf) == 0:
-                raise Exception("Zero length data from usb")
+        (rlist, _, xlist) = select.select(rsocks, [], xsocks, args.timeout/1000)
 
-            to_pipe.write(buf)
+        if xlist:
+            # one of our pipes is closed, bail out
+            break
+
+        if rlist:
+            # only one rx socket, so no need to loop
+            buf = from_pipe.read(BUFSIZE)
+
+            nbytes = to_usb.write(buf)
+            if nbytes != len(buf):
+                raise ValueError("Short write to usb")
+
+        try:
+            buf = from_usb.read(BUFSIZE, timeout=args.timeout)
+            if buf:
+                to_pipe.write(buf)
+
+
         except usb.core.USBError as e:
             if e.errno == errno.ETIMEDOUT:
-                break
+                usb_timeouts += 1
+                if usb_timeouts > 5:
+                    # I think this request might be done ..
+                    break
+
+                continue
             else:
                 raise e
