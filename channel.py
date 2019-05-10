@@ -40,7 +40,12 @@ def ep_in(intf):
     return _ep_type(intf, usb.util.ENDPOINT_IN)
 
 if __name__ == "__main__":
-    intf = init()
+    import argparse
+    a = argparse.ArgumentParser('USB channel stdin -> TX, RX -> stdout')
+    a.add_argument('-i','--interface', action='store', default=0, type=int)
+    args = a.parse_args()
+
+    intf = init(interface=args.interface)
 
     from_usb = ep_in(intf)
     to_usb = ep_out(intf)
