@@ -14,3 +14,5 @@ a timeout, writing any received data to stdout.
 
 Usage:
     echo -e "GET /Scan/ScanCaps HTTP/1.1\n\n" |python3 ./channel.py
+
+    socat -d -d TCP-LISTEN:8082,fork,max-children=1 "EXEC:python3 ./channel.py"
