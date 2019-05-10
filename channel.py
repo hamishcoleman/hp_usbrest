@@ -43,6 +43,7 @@ if __name__ == "__main__":
     import argparse
     a = argparse.ArgumentParser('USB channel stdin -> TX, RX -> stdout')
     a.add_argument('-i','--interface', action='store', default=0, type=int)
+    a.add_argument('-t','--timeout', action='store', default=1000, type=int)
     args = a.parse_args()
 
     intf = init(interface=args.interface)
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 
     while True:
         try:
-            buf = from_usb.read(4096)
+            buf = from_usb.read(4096, timeout=args.timeout)
             if len(buf) == 0:
                 raise Exception("Zero length data from usb")
 
