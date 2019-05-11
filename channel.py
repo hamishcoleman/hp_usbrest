@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 '''
 Routines to find the usb device and communicate via the channels
+
+TODO
+- implement a timeout for either direction in the main function, not just a
+  usb receive timeout.
 '''
 
 import errno
