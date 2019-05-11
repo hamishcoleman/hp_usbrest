@@ -8,6 +8,12 @@ While I could find other clients written to talk to this REST endpoint,
 none of them were written to work with USB - they all expected to connect
 to a normal HTTP-over-TCP server.
 
+Originally, I was hoping to find a way to detect that one of the buttons
+on the device had been pressed - and use that to automate a scanning
+session.  However, it seems that this is not supported (However, more
+expensive devices supporting this REST protocol do have a screen that
+can offer "scan to PC" destinations)
+
 Tested on
     DeskJet 2130 series
 
