@@ -4,9 +4,9 @@ Modern models of these printers appear to have a HTTP-over-USB server
 running on them, which is used as a REST service for allmost all
 interactions with the printer and scanner.
 
-While I could find other clients written to talk to this REST endpoint, none
-of them were written to work with USB - they all expected to connect to a
-normal HTTP-over-TCP server.
+While I could find other clients written to talk to this REST endpoint,
+none of them were written to work with USB - they all expected to connect
+to a normal HTTP-over-TCP server.
 
 Tested on
     DeskJet 2130 series
